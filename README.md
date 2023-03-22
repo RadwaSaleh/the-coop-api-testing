@@ -21,6 +21,7 @@ Import > File > Choose Files > Select The_Coop_API.postman_collection.json
 3. This will create a directory "newman" that will contain html report 
 
 #### Expected Results 
-All passing except 3 failed tests with prefix "INTENDED FAILURE"
+All passing except 3 failed tests with prefix "INTENDED FAILURE".
+
 TODO: Report the 3 issues in [Issues tab](https://github.com/RadwaSaleh/the-coop-api-testing/issues)
 ![alt text](https://github.com/RadwaSaleh/the-coop-api-testing/blob/main/newman/newman%20report%20example.png)
