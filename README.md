@@ -15,9 +15,9 @@ REST APIs tests using postman for [The Coop](http://coop.apps.symfonycasts.com/a
 Import > File > Choose Files > Select The_Coop_API.postman_collection.json
 
 #### Run Tests with CLI
-1. Download the The_Coop_API.postman_collection.json file 
-2. No need to download the environment file as the token has expiration time and will be generated and saved from the collection file. Only use the same file name or exchange it in the following command
-```newman run The_Coop_API.postman_collection.json -e Dev_The_Coop.postman_environment.json -r html```
+1. Download the `The_Coop_API.postman_collection.json` file 
+2. No need to download the environment file as the token has expiration time and will be generated and saved as environment variable. Only use the same file name or exchange it in the following command
+`newman run The_Coop_API.postman_collection.json -e Dev_The_Coop.postman_environment.json -r html`
 3. This will create a directory "newman" that will contain html report 
 
 #### Expected Results 
