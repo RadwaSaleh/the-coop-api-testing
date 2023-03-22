@@ -22,4 +22,5 @@ Import > File > Choose Files > Select The_Coop_API.postman_collection.json
 
 #### Expected Results 
 All passing except 3 failed tests with prefix "INTENDED FAILURE"
+TODO: Report the 3 issues in Issues tab
 ![alt text](https://github.com/RadwaSaleh/the-coop-api-testing/blob/main/newman/newman%20report%20example.png)
