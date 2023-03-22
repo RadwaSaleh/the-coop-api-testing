@@ -1,0 +1,672 @@
+{
+	"info": {
+		"_postman_id": "3008fed8-7b59-4ac3-b248-fc242431c260",
+		"name": "The_Coop_API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "8581753"
+	},
+	"item": [
+		{
+			"name": "getAccessToken",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let jsonData;",
+							"",
+							"pm.test(\"Access token is retrieved and status code is 200\", () => {",
+							"    jsonData = pm.response.json();",
+							"    pm.response.to.have.status(200);",
+							"    pm.environment.set(\"token\", jsonData.access_token);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {
+					"content-type": true
+				}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Basic UmFkd2EgVGVzdCBBcHA6MmNkMjY1YzVlYWI3NDE4ZDdhNGY5MDZjMmFlNjhlNjI=",
+						"description": "Basic UmFkd2EgVGVzdCBBcHA6MmNkMjY1YzVlYWI3NDE4ZDdhNGY5MDZjMmFlNjhlNjI=",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "client_credentials",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "{{client_id}}",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "{{client_secret}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{auth_url}}",
+					"host": [
+						"{{auth_url}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getSignedInUser",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let jsonData;",
+							"",
+							"pm.test(\"Signed in user details are retrieved and status code is 200\", () => {",
+							"    jsonData = pm.response.json();",
+							"",
+							"    pm.response.to.have.status(200);",
+							"    pm.expect(jsonData.id).not.null;",
+							"    pm.expect(jsonData.email).not.null;",
+							"    pm.expect(jsonData.firstName).not.null;",
+							"    pm.expect(jsonData.lastName).not.null;",
+							"    pm.collectionVariables.set(\"userId\", jsonData.id);",
+							"});",
+							"",
+							"pm.test(\"User details are retrieved as expected\", () => {",
+							"    pm.expect(jsonData.email).eql(pm.collectionVariables.get('user_email'));",
+							"    pm.expect(jsonData.firstName).eql(pm.collectionVariables.get('user_first_name'));",
+							"    pm.expect(jsonData.lastName).eql(pm.collectionVariables.get('user_last_name'));",
+							"});",
+							"",
+							"pm.test(\"Data type of the response\", () => {",
+							"  pm.expect(jsonData.id).to.be.an(\"string\");",
+							"  pm.expect(jsonData.email).to.be.a(\"string\");",
+							"  pm.expect(jsonData.firstName).to.be.a(\"string\");",
+							"  pm.expect(jsonData.lastName).to.be.an(\"string\");",
+							"});",
+							"",
+							"// Intended failure assuming there's a performance requirement that is not met ",
+							"pm.test(\"INTENDED FAIL - Response time is less than 200ms\", () => {",
+							"  pm.expect(pm.response.responseTime).to.be.below(200);",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/me",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"me"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "unlockTheBarn",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let jsonData;",
+							"const expectedJsonBody =",
+							"{",
+							"    \"action\": \"barn-unlock\",",
+							"    \"success\": true,",
+							"    \"message\": \"You just unlocked your barn! Watch out for strangers!\",",
+							"    \"data\": null",
+							"}",
+							"",
+							"pm.test(\"success status with authorized user id\", () => {",
+							"    jsonData = pm.response.json();",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"correct response body\", () => {",
+							"    pm.expect(JSON.stringify(jsonData)).to.eql(JSON.stringify(expectedJsonBody));",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/{{user_id}}/barn-unlock",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"{{user_id}}",
+						"barn-unlock"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "unlockTheBarn_fail_invalid_user_id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let jsonData;",
+							"",
+							"pm.test(\"unauthorized with wrong user id\", () => {",
+							"    jsonData = pm.response.json();",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"verify error message\", () => {",
+							"    pm.expect(jsonData).to.have.haveOwnProperty(\"error\", \"access_denied\");",
+							"    pm.expect(jsonData).to.have.haveOwnProperty(\"error_message\", \"You do not have access to take this action on behalf of this user\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{base_url}}/api/{{wrong_user_id}}/barn-unlock",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"{{wrong_user_id}}",
+						"barn-unlock"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "unlockTheBarn_frequent_calls",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const postUnlockBarnRequest = {",
+							"  url: `${pm.collectionVariables.get(\"base_url\")}/api/${pm.collectionVariables.get(\"user_id\")}/barn-unlock`,",
+							"  method: 'POST',",
+							"  header: {",
+							"    'Content-Type': 'application/json',",
+							"  }",
+							"};",
+							"",
+							"pm.sendRequest(postUnlockBarnRequest, (error, response) => {",
+							"    if (error) {",
+							"        console.log(\"Error in pre-request script: \" + error);",
+							"    }",
+							"",
+							"    pm.test('response should be okay to process', () => {",
+							"        pm.expect(error).to.equal(null);",
+							"        pm.expect(response).to.have.property('code', 200);",
+							"        pm.expect(response).to.have.property('status', 'OK');",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let jsonData;",
+							"const expectedJsonBody = ",
+							"{",
+							"    \"action\": \"barn-unlock\",",
+							"    \"success\": true,",
+							"    \"message\": \"You just unlocked your barn! Watch out for strangers!\",",
+							"    \"data\": null",
+							"}",
+							"",
+							"// intended failure => going to report as a bug",
+							"pm.test(\"INTENDED FAIL - expect 429 too many requests\", () => {",
+							"    jsonData = pm.response.json();",
+							"    pm.response.to.have.status(429);",
+							"});",
+							"",
+							"// TODO discuss with dev since no clear requirement when this response shows",
+							"pm.test(\"INTENDED FAIL - correct response body\", () => {",
+							"    pm.expect(JSON.stringify(jsonData)).to.eql(JSON.stringify(expectedJsonBody));",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/{{user_id}}/barn-unlock",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"{{user_id}}",
+						"barn-unlock"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "collectEggs",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let jsonData;",
+							"",
+							"pm.test(\"success status with correct user id\", () => {",
+							"    jsonData = pm.response.json();",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"verify response body\", () => {",
+							"    pm.expect(jsonData).to.haveOwnProperty(\"action\", \"eggs-collect\");",
+							"    pm.expect(jsonData).to.haveOwnProperty(\"success\", true);",
+							"    pm.expect(jsonData.message).to.contain('eggs have been collected!');",
+							"    pm.expect(jsonData).to.haveOwnProperty(\"data\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/{{user_id}}/eggs-collect",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"{{user_id}}",
+						"eggs-collect"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "collectEggs_fail_invalid_user_id",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"let jsonData;",
+							"",
+							"pm.test(\"unauthorized with wrong user id\", () => {",
+							"    jsonData = pm.response.json();",
+							"    pm.response.to.have.status(401);",
+							"});",
+							"",
+							"pm.test(\"verify error message\", () => {",
+							"    pm.expect(jsonData).to.have.haveOwnProperty(\"error\", \"access_denied\");",
+							"    pm.expect(jsonData).to.have.haveOwnProperty(\"error_message\", \"You do not have access to take this action on behalf of this user\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/{{wrong_user_id}}/eggs-collect",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"{{wrong_user_id}}",
+						"eggs-collect"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getTodaysCollectedEggs",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"let jsonData;",
+							"",
+							"const postEggsCount = {",
+							"    url: `${pm.collectionVariables.get(\"base_url\")}/api/${pm.collectionVariables.get(\"user_id\")}/eggs-count`,",
+							"    method: 'POST',",
+							"    auth: {",
+							"\t\ttype: \"bearer\",",
+							"\t\tbearer: [",
+							"\t\t\t{",
+							"\t\t\t\tkey: \"token\",",
+							"\t\t\t\tvalue: `${pm.environment.get('token')}`,",
+							"\t\t\t\ttype: \"string\"",
+							"\t\t\t}",
+							"\t\t]",
+							"\t},",
+							"    header: {",
+							"        'Content-Type': 'application/json',",
+							"    }",
+							"};",
+							"",
+							"",
+							"//save request to use in Tests tab",
+							"pm.collectionVariables.set('postEggsCount', postEggsCount);",
+							"",
+							"pm.test(\"success status and save count\", () => {",
+							"    pm.sendRequest(postEggsCount, (error, response) => {",
+							"        if (error) {",
+							"            console.log(error);",
+							"        }",
+							"        //save total collected eggs today",
+							"        jsonData = response.json();",
+							"        pm.collectionVariables.set('totalEggsToday', jsonData.data);",
+							"    });",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"/**",
+							" * Test Scenario",
+							" * count total today's eggs and save count [Pre-request Script]",
+							" * collect eggs [main request]",
+							" * count again and expect total count = oldCount + recentCollectedEggs [Test tab]",
+							" */",
+							"",
+							"let collectEggsResponse, recentCollectedEggs;",
+							"",
+							"pm.test(\"collected successfully\", () => {",
+							"    collectEggsResponse = pm.response.json();",
+							"    pm.response.to.have.status(200);",
+							"    recentCollectedEggs = collectEggsResponse.data;",
+							"});",
+							"",
+							"const postEggsCount = pm.collectionVariables.get('postEggsCount');",
+							"",
+							"pm.test(\"count collected eggs again and verify it's calculated correctly\", () => {",
+							"    pm.sendRequest(postEggsCount, (error, response) => {",
+							"        if (error) {",
+							"            console.log(error);",
+							"        }",
+							"        pm.expect(error).to.equal(null);",
+							"        pm.expect(response).to.have.property('code', 200);",
+							"        const newTotal = response.json().data;",
+							"        pm.expect(newTotal).to.equal(recentCollectedEggs + pm.collectionVariables.get('totalEggsToday'));",
+							"    });",
+							"",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/{{user_id}}/eggs-collect",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"{{user_id}}",
+						"eggs-collect"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "user_id",
+			"value": "4412"
+		},
+		{
+			"key": "totalEggsToday",
+			"value": ""
+		},
+		{
+			"key": "postEggsCount",
+			"value": ""
+		},
+		{
+			"key": "base_url",
+			"value": "http://coop.apps.symfonycasts.com",
+			"type": "string"
+		},
+		{
+			"key": "wrong_user_id",
+			"value": "abcd",
+			"type": "string"
+		},
+		{
+			"key": "user_email",
+			"value": "salehradwa@gmail.com",
+			"type": "string"
+		},
+		{
+			"key": "user_first_name",
+			"value": "Radwa",
+			"type": "string"
+		},
+		{
+			"key": "user_last_name",
+			"value": "Saleh",
+			"type": "string"
+		},
+		{
+			"key": "auth_url",
+			"value": "http://coop.apps.symfonycasts.com/token",
+			"type": "string"
+		},
+		{
+			"key": "client_id",
+			"value": "Radwa Test App",
+			"type": "string"
+		},
+		{
+			"key": "client_secret",
+			"value": "2cd265c5eab7418d7a4f906c2ae68e62",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": ""
+		}
+	]
+}
